@@ -13,6 +13,7 @@ class QueueManager
 {
   public:
     QueueManager();
+    bool isEmpty();
     void addLink(const Link& lnk);
     Link getLink();
   private:

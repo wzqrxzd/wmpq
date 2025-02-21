@@ -34,6 +34,11 @@ void QueueManager::addLink(const Link& lnk)
     throw std::runtime_error("Link is not valid.");
 }
 
+bool QueueManager::isEmpty()
+{
+  return musicDeque.empty();
+}
+
 Link QueueManager::getLink()
 {
   Link tmp = musicDeque.front();

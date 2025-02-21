@@ -14,22 +14,17 @@ int main()
 
   queue.addLink(lnk);
   queue.addLink(lnk2);
-  Link lnkTrack1 = queue.getLink();
-  Link lnkTrack2 = queue.getLink();
 
-  auto str = yt.getMp3Url(lnkTrack1);
-  auto str2 = yt.getMp3Url(lnkTrack2);
+  while (!queue.isEmpty())
+  {
+    Link lnkTrack = queue.getLink();
+    Link mp3Url = yt.getMp3Url(lnkTrack);
 
-  mpv.play(str);
-  mpv.setVolume(40);
-  mpv.waitUntilFinished();
-  /*while (!mpv.isFinished()) {*/
-  /*  std::this_thread::sleep_for(std::chrono::milliseconds(100));*/
-  /*}*/
+    mpv.play(mp3Url);
+    mpv.setVolume(40);
+    mpv.waitUntilFinished();
+  }
 
-  mpv.play(str2);
-  mpv.setVolume(20);
-  mpv.waitUntilFinished();
   /*while (!mpv.isFinished()) {*/
   /*  std::this_thread::sleep_for(std::chrono::milliseconds(100));*/
   /*}*/
