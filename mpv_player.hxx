@@ -26,8 +26,8 @@ class MpvPlayer
     std::atomic<bool> running{false};
     std::atomic<bool> finished;
     std::atomic<int> paused;
-    std::mutex mtx;  // Для блокировки
-    std::condition_variable cv;  // Условная переменная
+    std::mutex mtx;
+    std::condition_variable cv;
 };
 
 #endif

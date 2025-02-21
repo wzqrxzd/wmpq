@@ -85,7 +85,6 @@ void MpvPlayer::musicLoop()
       spdlog::info("Playback ended.");
       finished = true;
       cv.notify_all();
-      /*break;*/
     }
   }
 
