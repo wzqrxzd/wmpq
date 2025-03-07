@@ -3,9 +3,11 @@
 
 void Cli::eventLoop()
 {
-  spdlog::info("Commands: p <link> (play), s (stop), q (quit)");
+  spdlog::info("Commands: p <link> (play), s (stop), v <0-100> (volume), q (quit)");
 
   std::string command;
+
+  setVolume(40);
 
   while (true)
   {
@@ -14,20 +16,22 @@ void Cli::eventLoop()
 
     if (command == "q")
     {
-      stop();
-      if (playThread.joinable())
-        playThread.join();
-      spdlog::info("exited.");
+      quit();
     }
     else if (command == "s")
     {
       stop();
-      spdlog::info("Playback stopped.");
     }
-    else if (command.rfind("p"))
+    else if (command.starts_with("p "))
     {
       std::string lnk = command.substr(2);
-      queue.addLink(Link(lnk));
+      try {
+        queue.addLink(Link(lnk));
+      } catch (const std::runtime_error& e)
+      {
+        spdlog::error("Link is not valid.");
+        continue;
+      }
       
       if (!playing)
       {
@@ -36,6 +40,12 @@ void Cli::eventLoop()
           playThread.join();
         playThread = std::thread(&Cli::play, this);
       }
+    } else if (command.starts_with("v "))
+    {
+      int volume = std::stoi(command.substr(2));
+      setVolume(volume);
+    } else {
+      spdlog::error("Unknown command.");
     }
   }
   if (playThread.joinable())
@@ -43,17 +53,19 @@ void Cli::eventLoop()
 }
 
 void Cli::quit() {
-  stop();
+  mpv.stop();
+  playing = false;
+
   if (playThread.joinable())
     playThread.join();
-  spdlog::info("exited.");
+  exit(0);
 }
 
 void Cli::stop()
 {
-  stop();
+  mpv.stop();
   playing = false;
-  spdlog::info("Playback stoped.");
+  spdlog::info("Playback stopped.");
 }
 
 void Cli::play()
@@ -66,7 +78,6 @@ void Cli::play()
       Link mp3Url = YtdlpHandler::getMp3Url(lnkTrack);
 
       mpv.play(mp3Url);
-      mpv.setVolume(40);
 
       while (playing && !mpv.isFinished())
       {
@@ -76,4 +87,10 @@ void Cli::play()
       playing = false;
     }
   }
+}
+
+void Cli::setVolume(int volume)
+{
+  mpv.setVolume(volume);
+  spdlog::info("Volume setted to {}%", volume);
 }
