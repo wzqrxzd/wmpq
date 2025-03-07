@@ -48,15 +48,16 @@ void MpvPlayer::play(const Link& lnk)
   finished = false;
   const char* cmd[] = {"loadfile", lnk.url.c_str(), NULL};
   checkError(mpv_command(mpv, cmd));
-  spdlog::info("Playing: {}", lnk.url);
+  spdlog::debug("Playing: {}", lnk.url);
 }
 
-void MpvPlayer::stop() {
+void MpvPlayer::stop()
+{
   const char* cmd[] = {"stop", NULL};
   checkError(mpv_command(mpv, cmd));
   finished = true;
   cv.notify_all();
-  spdlog::info("Playback stopped.");
+  spdlog::debug("Playback stopped.");
 }
 
 void MpvPlayer::pause()
@@ -66,13 +67,11 @@ void MpvPlayer::pause()
   spdlog::info(paused ? "Paused." : "Resumed.");
 }
 
-
-
 void MpvPlayer::setVolume(double volume)
 {
   volume = std::clamp(volume, 0.0, 100.0);
   checkError(mpv_set_property(mpv, "volume", MPV_FORMAT_DOUBLE, &volume));
-  spdlog::info("Volume set to {}%", volume);
+  spdlog::debug("Volume set to {}%", volume);
 }
 
 void MpvPlayer::musicLoop()
@@ -82,10 +81,9 @@ void MpvPlayer::musicLoop()
     mpv_event* event = mpv_wait_event(mpv, 100);
     if (event->event_id == MPV_EVENT_END_FILE)
     {
-      spdlog::info("Playback ended.");
+      spdlog::debug("Playback ended.");
       finished = true;
       cv.notify_all();
     }
   }
-
 }

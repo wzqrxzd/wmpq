@@ -6,9 +6,9 @@
 
 class YtdlpHandler {
   public:
-    Link getMp3Url(const Link& url);
+    static Link getMp3Url(const Link& url);
   private:
-    std::string executeCommand(const char* cmd);
+    static std::string executeCommand(const char* cmd);
 };
 
 #endif

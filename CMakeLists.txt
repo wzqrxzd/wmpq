@@ -10,6 +10,7 @@ add_executable(wmpq
   queue_manager.cxx
   ytdlp_handler.cxx
   mpv_player.cxx
+  cli.cxx
 )
 
-target_link_libraries(wmpq PRIVATE spdlog fmt curl mpv)
+target_link_libraries(wmpq PRIVATE spdlog fmt curl mpv jsoncpp)
