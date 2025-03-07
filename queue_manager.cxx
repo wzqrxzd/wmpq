@@ -1,5 +1,6 @@
 #include "queue_manager.hxx"
 #include <curl/curl.h>
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 
 bool Link::isValid() const
@@ -28,10 +29,7 @@ QueueManager::QueueManager() : musicDeque() {};
 
 void QueueManager::addLink(const Link& lnk)
 {
-  if (lnk.isValid())
-    musicDeque.push_back(lnk);
-  else
-    throw std::runtime_error("Link is not valid.");
+  musicDeque.push_back(lnk);
 }
 
 bool QueueManager::isEmpty()
@@ -43,5 +41,26 @@ Link QueueManager::getLink()
 {
   Link tmp = musicDeque.front();
   musicDeque.pop_front();
+  if (looped)
+    musicDeque.push_back(tmp);
   return tmp;
+}
+
+bool QueueManager::loop()
+{
+  looped = !looped;
+  spdlog::info({"Looped: {}"}, looped);
+  return looped;
+}
+
+void QueueManager::printDeque() {
+    if (musicDeque.empty()) {
+        spdlog::info("The queue is empty.");
+        return;
+    }
+
+    spdlog::info("Queue contents:");
+    for (const auto& link : musicDeque) {
+        spdlog::info("URL: {}", link.url);
+    }
 }

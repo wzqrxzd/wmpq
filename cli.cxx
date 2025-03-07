@@ -21,12 +21,20 @@ void Cli::eventLoop()
     else if (command == "s")
     {
       stop();
+    } else if (command == "sk")
+    {
+      skip();
+    } else if (command == "l")
+    {
+      loop();
     }
     else if (command.starts_with("p "))
     {
-      std::string lnk = command.substr(2);
+      std::string lnkStr = command.substr(2);
+      Link lnk(lnkStr);
       try {
-        queue.addLink(Link(lnk));
+        Link mp3Url = YtdlpHandler::getMp3Url(lnk);
+        queue.addLink(mp3Url);
       } catch (const std::runtime_error& e)
       {
         spdlog::error("Link is not valid.");
@@ -75,9 +83,8 @@ void Cli::play()
     if (!queue.isEmpty())
     {
       Link lnkTrack = queue.getLink();
-      Link mp3Url = YtdlpHandler::getMp3Url(lnkTrack);
 
-      mpv.play(mp3Url);
+      mpv.play(lnkTrack);
 
       while (playing && !mpv.isFinished())
       {
@@ -94,3 +101,33 @@ void Cli::setVolume(int volume)
   mpv.setVolume(volume);
   spdlog::info("Volume setted to {}%", volume);
 }
+
+void Cli::loop()
+{
+  queue.loop();
+}
+
+void Cli::skip()
+{
+  mpv.stop();
+  playing = false;
+
+  spdlog::info("Skipping track...");
+
+  if (!queue.isEmpty())
+  {
+    spdlog::debug("Queue is not empty, starting next track.");
+
+    if (playThread.joinable())
+      playThread.join();
+
+    playing = true;
+
+    playThread = std::thread(&Cli::play, this);
+  }
+  else
+  {
+    spdlog::info("Queue is empty, nothing to skip to.");
+  }
+}
+

@@ -16,8 +16,11 @@ class QueueManager
     bool isEmpty();
     void addLink(const Link& lnk);
     Link getLink();
+    bool loop();
+    void printDeque();
   private:
     std::deque<Link> musicDeque;
+    bool looped{false};
 };
 
 #endif

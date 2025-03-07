@@ -19,6 +19,8 @@ class Cli {
     void stop();
     void quit();
     void setVolume(int volume);
+    void loop();
+    void skip();
 };
 
 #endif
