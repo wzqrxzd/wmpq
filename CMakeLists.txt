@@ -14,3 +14,4 @@ add_executable(wmpq
 )
 
 target_link_libraries(wmpq PRIVATE spdlog fmt curl mpv jsoncpp)
+install(TARGETS wmpq DESTINATION /usr/bin)
