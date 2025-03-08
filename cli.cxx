@@ -27,6 +27,8 @@ void Cli::eventLoop()
     } else if (command == "l")
     {
       loop();
+    } else if (command == "ps") {
+      pause();
     }
     else if (command.starts_with("p "))
     {
@@ -72,6 +74,7 @@ void Cli::quit() {
 void Cli::stop()
 {
   mpv.stop();
+  queue.clear();
   playing = false;
   spdlog::info("Playback stopped.");
 }
@@ -131,3 +134,8 @@ void Cli::skip()
   }
 }
 
+void Cli::pause()
+{
+  mpv.pause();
+  playing = !playing;
+}

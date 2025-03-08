@@ -16,6 +16,7 @@ class QueueManager
     bool isEmpty();
     void addLink(const Link& lnk);
     Link getLink();
+    void clear();
     bool loop();
     void printDeque();
   private:

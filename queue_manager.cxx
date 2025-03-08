@@ -54,13 +54,18 @@ bool QueueManager::loop()
 }
 
 void QueueManager::printDeque() {
-    if (musicDeque.empty()) {
-        spdlog::info("The queue is empty.");
-        return;
-    }
+  if (musicDeque.empty()) {
+    spdlog::info("The queue is empty.");
+    return;
+  }
 
-    spdlog::info("Queue contents:");
-    for (const auto& link : musicDeque) {
-        spdlog::info("URL: {}", link.url);
-    }
+  spdlog::info("Queue contents:");
+  for (const auto& link : musicDeque) {
+    spdlog::info("URL: {}", link.url);
+  }
+}
+
+void QueueManager::clear()
+{
+  musicDeque.clear();
 }

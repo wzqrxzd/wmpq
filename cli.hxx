@@ -17,6 +17,7 @@ class Cli {
 
     void play();
     void stop();
+    void pause();
     void quit();
     void setVolume(int volume);
     void loop();
