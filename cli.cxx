@@ -3,7 +3,7 @@
 
 void Cli::eventLoop()
 {
-  spdlog::info("Commands: p <link> (play), s (stop), v <0-100> (volume), q (quit)");
+  spdlog::info("Commands: p <link> (play), s (stop), v <0-100> (volume), sk (skip), l (loop), ps (pause), q (quit)");
 
   std::string command;
 
