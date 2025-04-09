@@ -1,74 +1,65 @@
 #include "cli.hxx"
+#include "command_handler.hxx"
 #include <iostream>
+
+void Cli::registerCommands()
+{
+  handler.registerCommand("q", [this](const std::string&){
+      quit();
+  });
+
+  handler.registerCommand("s", [this](const std::string&){
+      stop();
+  });
+
+  handler.registerCommand("sk", [this](const std::string&){
+      skip();
+  });
+
+  handler.registerCommand("l", [this](const std::string&){
+      loop();
+  });
+
+  handler.registerCommand("ps", [this](const std::string&){
+      pause();
+  });
+
+  handler.registerCommand("p", [this](const std::string& args){
+      playCommand(args);
+  });
+
+  handler.registerCommand("playlist", [this](const std::string& args){
+      playlistCommand(args);
+  });
+
+  handler.registerCommand("v", [this](const std::string& args){
+      try {
+        int volume = std::stoi(args);
+        setVolume(std::stoi(args));
+      } catch (...)
+      {
+        spdlog::error("Invalid volume.");
+      }
+  });
+
+}
 
 void Cli::eventLoop()
 {
+  registerCommands();
+
   spdlog::info("Commands: p <link> (play), s (stop), v <0-100> (volume), sk (skip), l (loop), ps (pause), q (quit)");
 
-  std::string command;
-
   setVolume(40);
-
+  
+  std::string command;
   while (true)
   {
     std::cout << "> ";
     std::getline(std::cin, command);
-
-    if (command == "q")
-    {
-      quit();
-    }
-    else if (command == "s")
-    {
-      stop();
-    } else if (command == "sk")
-    {
-      skip();
-    } else if (command == "l")
-    {
-      loop();
-    } else if (command == "ps") {
-      pause();
-    }
-    else if (command.starts_with("p "))
-    {
-      std::string lnkStr = command.substr(2);
-      Link lnk(lnkStr);
-      try {
-        Link mp3Url = YtdlpHandler::getMp3Url(lnk);
-        queue.addLink(mp3Url);
-      } catch (const std::runtime_error& e)
-      {
-        spdlog::error("Link is not valid.");
-        continue;
-      }
-      
-      if (!playing)
-      {
-        playing = true;
-        if (playThread.joinable())
-          playThread.join();
-        playThread = std::thread(&Cli::play, this);
-      }
-    } else if (command.starts_with("playlist ")) {
-      std::string pathStr = command.substr(9);
-      stop();
-      queue.setPlaylist(pathStr);
-      if (!playing)
-      {
-        playing = true;
-        if (playThread.joinable())
-          playThread.join();
-        playThread = std::thread(&Cli::play, this);
-      }
-    } else if (command.starts_with("v "))
-    {
-      int volume = std::stoi(command.substr(2));
-      setVolume(volume);
-    } else {
-      spdlog::error("Unknown command.");
-    }
+    handler.handleCommand(command);
   }
+
   if (playThread.joinable())
     playThread.join();
 }
@@ -88,6 +79,27 @@ void Cli::stop()
   queue.clear();
   playing = false;
   spdlog::info("Playback stopped.");
+}
+
+void Cli::playCommand(const std::string& args)
+{
+  Link lnk(args);
+  try {
+    Link mp3Url = YtdlpHandler::getMp3Url(lnk);
+    queue.addLink(mp3Url);
+  } catch (const std::runtime_error& e)
+  {
+    spdlog::error("Link is not valid.");
+    return;
+  }
+
+  if (!playing)
+  {
+    playing = true;
+    if (playThread.joinable())
+      playThread.join();
+    playThread = std::thread(&Cli::play, this);
+  }     
 }
 
 void Cli::play()
@@ -149,4 +161,17 @@ void Cli::pause()
 {
   mpv.pause();
   playing = !playing;
+}
+
+void Cli::playlistCommand(const std::string& args)
+{
+  stop();
+  queue.setPlaylist(args);
+  if (!playing)
+  {
+    playing = true;
+    if (playThread.joinable())
+      playThread.join();
+    playThread = std::thread(&Cli::play, this);
+  }
 }
