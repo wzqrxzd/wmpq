@@ -2,6 +2,8 @@
 #include <curl/curl.h>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
+#include <fstream>
+#include "ytdlp_handler.hxx"
 
 bool Link::isValid() const
 {
@@ -68,4 +70,24 @@ void QueueManager::printDeque() {
 void QueueManager::clear()
 {
   musicDeque.clear();
+}
+
+void QueueManager::setPlaylist(const fs::path& playlistPath)
+{
+  clear();
+
+  if (!fs::exists(playlistPath))
+    spdlog::warn("Playlist({}) not exist.", playlistPath.string());
+
+  std::ifstream playlistFile(playlistPath);
+  std::string track;
+  
+  while (std::getline(playlistFile, track))
+  {
+    spdlog::info("{}", track);
+    auto lnk = YtdlpHandler::getMp3Url(Link(track));
+    addLink(Link(lnk));
+  }
+
+  playlistFile.close();
 }

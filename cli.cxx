@@ -50,6 +50,17 @@ void Cli::eventLoop()
           playThread.join();
         playThread = std::thread(&Cli::play, this);
       }
+    } else if (command.starts_with("playlist ")) {
+      std::string pathStr = command.substr(9);
+      stop();
+      queue.setPlaylist(pathStr);
+      if (!playing)
+      {
+        playing = true;
+        if (playThread.joinable())
+          playThread.join();
+        playThread = std::thread(&Cli::play, this);
+      }
     } else if (command.starts_with("v "))
     {
       int volume = std::stoi(command.substr(2));
