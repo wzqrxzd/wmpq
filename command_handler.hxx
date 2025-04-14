@@ -1,5 +1,5 @@
-#ifndef COMMAND_INTERPRITATOR_HXX
-#define COMMAND_INTERPRITATOR_HXX
+#ifndef COMMAND_HANDLER_HXX
+#define COMMAND_HANDLER_HXX
 
 #include <functional>
 #include <unordered_map>

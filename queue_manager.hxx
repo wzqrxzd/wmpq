@@ -4,6 +4,7 @@
 #include <deque>
 #include <string>
 #include <filesystem>
+#include <curl/curl.h>
 
 namespace fs = std::filesystem;
 

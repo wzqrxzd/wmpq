@@ -7,9 +7,11 @@
 
 bool Link::isValid() const
 {
-  CURL* curl = curl_easy_init();
+  static CURL* curl = curl_easy_init();
   if (!curl)
     throw std::runtime_error("Curl initialization error.");
+
+  curl_easy_reset(curl);
 
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);  // Не загружаем содержимое, только проверяем заголовки
@@ -21,8 +23,6 @@ bool Link::isValid() const
   if (res == CURLE_OK) {
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
   }
-
-  curl_easy_cleanup(curl);
     
   return (res == CURLE_OK && response_code == 200);
 }
@@ -84,7 +84,8 @@ void QueueManager::setPlaylist(const fs::path& playlistPath)
   
   while (std::getline(playlistFile, track))
   {
-    spdlog::info("{}", track);
+    auto [name, author] = YtdlpHandler::getInfo(Link(track));
+    spdlog::info("{} | {}", name, author);
     auto lnk = YtdlpHandler::getMp3Url(Link(track));
     addLink(Link(lnk));
   }

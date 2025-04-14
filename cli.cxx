@@ -35,7 +35,7 @@ void Cli::registerCommands()
   handler.registerCommand("v", [this](const std::string& args){
       try {
         int volume = std::stoi(args);
-        setVolume(std::stoi(args));
+        this->volume(std::stoi(args));
       } catch (...)
       {
         spdlog::error("Invalid volume.");
@@ -50,7 +50,7 @@ void Cli::eventLoop()
 
   spdlog::info("Commands: p <link> (play), s (stop), v <0-100> (volume), sk (skip), l (loop), ps (pause), q (quit)");
 
-  setVolume(40);
+  volume(40);
   
   std::string command;
   while (true)
@@ -122,7 +122,7 @@ void Cli::play()
   }
 }
 
-void Cli::setVolume(int volume)
+void Cli::volume(int volume)
 {
   mpv.setVolume(volume);
   spdlog::info("Volume setted to {}%", volume);

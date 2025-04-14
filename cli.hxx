@@ -24,9 +24,10 @@ class Cli {
     void stop();
     void pause();
     void quit();
-    void setVolume(int volume);
+    void volume(int volume);
     void loop();
     void skip();
+
     void playCommand(const std::string& args);
     void playlistCommand(const std::string& args);
 };
